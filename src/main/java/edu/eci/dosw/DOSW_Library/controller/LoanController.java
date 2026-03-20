@@ -3,7 +3,7 @@ package edu.eci.dosw.DOSW_Library.controller;
 import edu.eci.dosw.DOSW_Library.core.model.Book;
 import edu.eci.dosw.DOSW_Library.core.model.Loan;
 import edu.eci.dosw.DOSW_Library.core.model.User;
-import edu.eci.dosw.DOSW_Library.core.service.BookServicce;
+import edu.eci.dosw.DOSW_Library.core.service.BookService;
 import edu.eci.dosw.DOSW_Library.core.service.LoanService;
 import edu.eci.dosw.DOSW_Library.core.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +16,10 @@ import java.util.List;
 public class LoanController {
 
     private final LoanService loanService;
-    private final BookServicce bookService;
+    private final BookService bookService;
     private final UserService userService;
 
-    public LoanController(LoanService loanService, BookServicce bookService, UserService userService) {
+    public LoanController(LoanService loanService, BookService bookService, UserService userService) {
         this.loanService = loanService;
         this.bookService = bookService;
         this.userService = userService;

@@ -4,9 +4,6 @@ import edu.eci.dosw.DOSW_Library.core.exception.UserNotFoundException;
 import edu.eci.dosw.DOSW_Library.core.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceTest {
@@ -18,42 +15,74 @@ public class UserServiceTest {
         userService = new UserService();
     }
 
-    // ── Exitosos ──────────────────────────────
-
     @Test
-    void testAddUserYGetById_Exitoso() {
+    void testAddUser_Exitoso() {
         userService.addUser("Sebastian", "U001");
         User user = userService.getUserById("U001");
         assertNotNull(user);
-        assertEquals("U001", user.getId());
         assertEquals("Sebastian", user.getName());
     }
 
     @Test
-    void testGetAllUsers_RetornaListaConUsuarios() {
+    void testAddUser_NombreVacio_LanzaExcepcion() {
+        assertThrows(IllegalArgumentException.class,
+                () -> userService.addUser("", "U001"));
+    }
+
+    @Test
+    void testAddUser_IdVacio_LanzaExcepcion() {
+        assertThrows(IllegalArgumentException.class,
+                () -> userService.addUser("Sebastian", ""));
+    }
+
+    @Test
+    void testGetUserById_Exitoso() {
+        userService.addUser("Sebastian", "U001");
+        assertEquals("U001", userService.getUserById("U001").getId());
+    }
+
+    @Test
+    void testGetUserById_NoExiste_LanzaExcepcion() {
+        assertThrows(UserNotFoundException.class,
+                () -> userService.getUserById("NOEXISTE"));
+    }
+
+    @Test
+    void testGetAllUsers_Exitoso() {
         userService.addUser("Sebastian", "U001");
         userService.addUser("Maria", "U002");
-        List<User> lista = userService.getAllUsers();
-        assertEquals(2, lista.size());
+        assertEquals(2, userService.getAllUsers().size());
     }
 
     @Test
     void testGetAllUsers_ListaVacia() {
-        List<User> lista = userService.getAllUsers();
-        assertTrue(lista.isEmpty());
-    }
-
-    // ── Error ─────────────────────────────────
-
-    @Test
-    void testGetUserById_NoExiste_LanzaExcepcion() {
-        assertThrows(UserNotFoundException.class, () -> userService.getUserById("NOEXISTE"));
+        assertTrue(userService.getAllUsers().isEmpty());
     }
 
     @Test
-    void testGetUserById_MensajeExcepcionCorrecto() {
-        UserNotFoundException ex = assertThrows(UserNotFoundException.class,
-                () -> userService.getUserById("X99"));
-        assertTrue(ex.getMessage().contains("X99"));
+    void testDeleteUser_Exitoso() {
+        userService.addUser("Sebastian", "U001");
+        userService.deleteUserId("U001");
+        assertThrows(UserNotFoundException.class,
+                () -> userService.getUserById("U001"));
+    }
+
+    @Test
+    void testDeleteUser_NoExiste_LanzaExcepcion() {
+        assertThrows(UserNotFoundException.class,
+                () -> userService.deleteUserId("NOEXISTE"));
+    }
+
+    @Test
+    void testUpdateUser_Exitoso() {
+        userService.addUser("Sebastian", "U001");
+        userService.updateUserId("U001", "Maria");
+        assertEquals("Maria", userService.getUserById("U001").getName());
+    }
+
+    @Test
+    void testUpdateUser_NoExiste_LanzaExcepcion() {
+        assertThrows(UserNotFoundException.class,
+                () -> userService.updateUserId("NOEXISTE", "Maria"));
     }
 }

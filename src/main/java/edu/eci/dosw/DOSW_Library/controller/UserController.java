@@ -11,7 +11,7 @@ import java.util.List;
 @RequestMapping("/api/users")
 public class UserController {
 
-    private final UserService userService;
+    private final UserService userService; //inyeccion de dependencias
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -32,5 +32,18 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable String id) {
         return ResponseEntity.ok(userService.getUserById(id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable String id) {
+        userService.deleteUserId(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateUser(@PathVariable String id,
+                                           @RequestParam String name) {
+        userService.updateUserId(id, name);
+        return ResponseEntity.ok().build();
     }
 }

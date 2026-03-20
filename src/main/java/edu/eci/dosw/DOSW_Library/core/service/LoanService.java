@@ -6,6 +6,8 @@ import edu.eci.dosw.DOSW_Library.core.model.Loan;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import edu.eci.dosw.DOSW_Library.core.validator.LoanValidator;
 import org.springframework.stereotype.Service;
 import edu.eci.dosw.DOSW_Library.core.model.*;
 
@@ -14,6 +16,7 @@ public class LoanService {
     private final List<Loan> loans = new ArrayList<>();
 
     public Loan loanBook(Book book, User user) {
+        LoanValidator.validate(book, user);
         if (!isBookAvailable(book)) {
             throw new BookNotAvailableException(book.getId());
         }

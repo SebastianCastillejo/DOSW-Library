@@ -1,7 +1,9 @@
 package edu.eci.dosw.DOSW_Library.core.model;
 
+import lombok.Data;
 import java.time.LocalDate;
 
+@Data
 public class Loan {
     private Book book;
     private User user;
@@ -13,37 +15,5 @@ public class Loan {
         this.user = user;
         this.loanDate = LocalDate.now();
         this.status = Status.ACTIVE;
-    }
-
-    public Book getBook() {
-        return book;
-    }
-
-    public void setBook(Book book) {
-        this.book = book;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public LocalDate getLoanDate() {
-        return loanDate;
-    }
-
-    public void setLoanDate(LocalDate loanDate) {
-        this.loanDate = loanDate;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
     }
 }
