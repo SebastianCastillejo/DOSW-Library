@@ -1,65 +1,112 @@
 package edu.eci.dosw.DOSW_Library.core.service;
 
+import edu.eci.dosw.DOSW_Library.controller.dto.BookDTO;
+import edu.eci.dosw.DOSW_Library.controller.mapper.BookMapper;
 import edu.eci.dosw.DOSW_Library.core.exception.BookNotFoundException;
-import edu.eci.dosw.DOSW_Library.core.model.Book;
-import edu.eci.dosw.DOSW_Library.core.validator.BookValidator;
+import edu.eci.dosw.DOSW_Library.persistence.entity.BookEntity;
+import edu.eci.dosw.DOSW_Library.persistence.repository.BookRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @Service
 public class BookService {
-    private final Map<String, Book> books;
 
-    public BookService() {
-        this.books = new HashMap<>();
+    private final BookRepository bookRepository;
+    private final BookMapper bookMapper;
+
+    public BookService(BookRepository bookRepository, BookMapper bookMapper) {
+        this.bookRepository = bookRepository;
+        this.bookMapper = bookMapper;
     }
 
-    public void addBook(String title, String autor, String id) {
-        BookValidator.validate(title, autor, id);
-        this.books.put(id, new Book(title, autor, id));
-    }
-
-    public Book getBookById(String id) {
-        return books.values().stream()
-                .filter(b -> b.getId().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new BookNotFoundException(id));
-    }
-
-    public List<Book> getAllBooks() {
-        return new ArrayList<>(books.values());
-    }
-
-    public void deleteBookId(String id) {
-        if (!books.containsKey(id)) {
-            throw new BookNotFoundException(id);
+    // Solo LIBRARIAN puede crear libros
+    public BookDTO addBook(String title, String autor, String isbn, Integer totalCopies, Integer availableCopies) {
+        if (totalCopies <= 0) {
+            throw new IllegalArgumentException("Total copies must be greater than 0");
         }
-        books.remove(id);
+        if (availableCopies < 0) {
+            throw new IllegalArgumentException("Available copies cannot be negative");
+        }
+        if (availableCopies > totalCopies) {
+            throw new IllegalArgumentException("Available copies cannot exceed total copies");
+        }
+
+        BookEntity entity = BookEntity.builder()
+                .title(title)
+                .autor(autor)
+                .isbn(isbn)
+                .totalCopies(totalCopies)
+                .availableCopies(availableCopies)
+                .build();
+
+        return bookMapper.toDTO(bookRepository.save(entity));
     }
 
-    public void updateBook(String id, String title, String autor) {
-        Book book = books.values().stream()
-                .filter(k -> k.getId().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new BookNotFoundException(id));
-
-        book.setTitle(title);
-        book.setAutor(autor);
+    // Cualquier usuario autenticado puede ver libros
+    public BookDTO getBookById(Long id) {
+        return bookRepository.findById(id)
+                .map(bookMapper::toDTO)
+                .orElseThrow(() -> new BookNotFoundException(String.valueOf(id)));
     }
 
-    public List<Book> getBooksByAutor(String autor) {
-        List<Book> result = books.values().stream()
-                .filter(b -> b.getAutor().equals(autor))
-                .toList();
+    public List<BookDTO> getAllBooks() {
+        return bookMapper.toDTOList(bookRepository.findAll());
+    }
+
+    // Solo libros con copias disponibles > 0
+    public List<BookDTO> getAvailableBooks() {
+        return bookMapper.toDTOList(bookRepository.findByAvailableCopiesGreaterThan(0));
+    }
+
+    // Solo LIBRARIAN puede eliminar libros
+    public void deleteBook(Long id) {
+        if (!bookRepository.existsById(id)) {
+            throw new BookNotFoundException(String.valueOf(id));
+        }
+        bookRepository.deleteById(id);
+    }
+
+    // Solo LIBRARIAN puede actualizar libros (incluyendo stock)
+    public BookDTO updateBook(Long id, String title, String autor, Integer totalCopies, Integer availableCopies) {
+        BookEntity book = bookRepository.findById(id)
+                .orElseThrow(() -> new BookNotFoundException(String.valueOf(id)));
+
+        if (title != null && !title.isBlank()) book.setTitle(title);
+        if (autor != null && !autor.isBlank()) book.setAutor(autor);
+
+        if (totalCopies != null) {
+            if (totalCopies <= 0) throw new IllegalArgumentException("Total copies must be greater than 0");
+            book.setTotalCopies(totalCopies);
+        }
+        if (availableCopies != null) {
+            if (availableCopies < 0) throw new IllegalArgumentException("Available copies cannot be negative");
+            if (availableCopies > book.getTotalCopies()) throw new IllegalArgumentException("Available copies cannot exceed total copies");
+            book.setAvailableCopies(availableCopies);
+        }
+
+        return bookMapper.toDTO(bookRepository.save(book));
+    }
+
+    public List<BookDTO> getBooksByAutor(String autor) {
+        List<BookEntity> result = bookRepository.findByAutor(autor);
         if (result.isEmpty()) {
             throw new BookNotFoundException(autor);
         }
-        return result;
+        return bookMapper.toDTOList(result);
     }
 
-    public boolean existsBook(String id) {
-        return books.containsKey(id);
+    public boolean existsBook(String isbn) {
+        return bookRepository.existsByIsbn(isbn);
+    }
+
+    // Métodos internos usados por LoanService (trabajan con entidades)
+    public BookEntity getEntityById(Long id) {
+        return bookRepository.findById(id)
+                .orElseThrow(() -> new BookNotFoundException(String.valueOf(id)));
+    }
+
+    public void save(BookEntity book) {
+        bookRepository.save(book);
     }
 }

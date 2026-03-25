@@ -1,6 +1,6 @@
 package edu.eci.dosw.DOSW_Library.controller;
 
-import edu.eci.dosw.DOSW_Library.core.model.Book;
+import edu.eci.dosw.DOSW_Library.controller.dto.BookDTO;
 import edu.eci.dosw.DOSW_Library.core.service.BookService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,46 +17,59 @@ public class BookController {
         this.bookService = bookService;
     }
 
+    // LIBRARIAN only
     @PostMapping
-    public ResponseEntity<Void> addBook(@RequestParam String title,
-                                        @RequestParam String autor,
-                                        @RequestParam String id) {
-        bookService.addBook(title, autor, id);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<BookDTO> addBook(@RequestParam String title,
+                                           @RequestParam String autor,
+                                           @RequestParam String isbn,
+                                           @RequestParam Integer totalCopies,
+                                           @RequestParam Integer availableCopies) {
+        return ResponseEntity.ok(bookService.addBook(title, autor, isbn, totalCopies, availableCopies));
     }
 
+    // All authenticated users
     @GetMapping
-    public ResponseEntity<List<Book>> getAllBooks() {
+    public ResponseEntity<List<BookDTO>> getAllBooks() {
         return ResponseEntity.ok(bookService.getAllBooks());
     }
 
+    // All authenticated users
+    @GetMapping("/available")
+    public ResponseEntity<List<BookDTO>> getAvailableBooks() {
+        return ResponseEntity.ok(bookService.getAvailableBooks());
+    }
+
+    // All authenticated users
     @GetMapping("/{id}")
-    public ResponseEntity<Book> getBookById(@PathVariable String id) {
+    public ResponseEntity<BookDTO> getBookById(@PathVariable Long id) {
         return ResponseEntity.ok(bookService.getBookById(id));
     }
 
+    // LIBRARIAN only
     @DeleteMapping("/{id}")
-    public  ResponseEntity<Void> deleteBookId(@PathVariable String id){
-        bookService.deleteBookId(id);
+    public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
+        bookService.deleteBook(id);
         return ResponseEntity.ok().build();
-
     }
 
+    // LIBRARIAN only
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateBook(@PathVariable String id,
-                                           @RequestParam String title,
-                                           @RequestParam String autor) {
-        bookService.updateBook(id, title, autor);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<BookDTO> updateBook(@PathVariable Long id,
+                                              @RequestParam(required = false) String title,
+                                              @RequestParam(required = false) String autor,
+                                              @RequestParam(required = false) Integer totalCopies,
+                                              @RequestParam(required = false) Integer availableCopies) {
+        return ResponseEntity.ok(bookService.updateBook(id, title, autor, totalCopies, availableCopies));
     }
 
+    // All authenticated users
     @GetMapping("/autor/{autor}")
-    public ResponseEntity<List<Book>> getBooksByAutor(@PathVariable String autor) {
+    public ResponseEntity<List<BookDTO>> getBooksByAutor(@PathVariable String autor) {
         return ResponseEntity.ok(bookService.getBooksByAutor(autor));
     }
 
-    @GetMapping("/exists/{id}")
-    public ResponseEntity<Boolean> existsBook(@PathVariable String id) {
-        return ResponseEntity.ok(bookService.existsBook(id));
+    @GetMapping("/exists/{isbn}")
+    public ResponseEntity<Boolean> existsBook(@PathVariable String isbn) {
+        return ResponseEntity.ok(bookService.existsBook(isbn));
     }
 }
