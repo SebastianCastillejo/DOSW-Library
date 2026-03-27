@@ -61,3 +61,13 @@ jacoco tenemos 83%, esto es por lo que los mapper y los dtos aun no estan implme
 
 ---
 se anexo el JSON del swager
+
+---
+# video persistencia
+
+https://www.youtube.com/watch?v=7D4nlBOfeTo
+
+# video seguridad
+
+https://www.youtube.com/watch?v=-19HLQSgZGY
+

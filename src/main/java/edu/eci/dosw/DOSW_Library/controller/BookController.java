@@ -3,6 +3,7 @@ package edu.eci.dosw.DOSW_Library.controller;
 import edu.eci.dosw.DOSW_Library.controller.dto.BookDTO;
 import edu.eci.dosw.DOSW_Library.core.service.BookService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,8 +18,9 @@ public class BookController {
         this.bookService = bookService;
     }
 
-    // LIBRARIAN only
+    // Punto 7: Solo LIBRARIAN gestiona el inventario
     @PostMapping
+    @PreAuthorize("hasRole('LIBRARIAN')")
     public ResponseEntity<BookDTO> addBook(@RequestParam String title,
                                            @RequestParam String autor,
                                            @RequestParam String isbn,
@@ -27,49 +29,51 @@ public class BookController {
         return ResponseEntity.ok(bookService.addBook(title, autor, isbn, totalCopies, availableCopies));
     }
 
-    // All authenticated users
+    // Punto 7: Usuarios y Librarians pueden consultar
     @GetMapping
+    @PreAuthorize("hasAnyRole('USER', 'LIBRARIAN')")
     public ResponseEntity<List<BookDTO>> getAllBooks() {
         return ResponseEntity.ok(bookService.getAllBooks());
     }
 
-    // All authenticated users
     @GetMapping("/available")
+    @PreAuthorize("hasAnyRole('USER', 'LIBRARIAN')")
     public ResponseEntity<List<BookDTO>> getAvailableBooks() {
         return ResponseEntity.ok(bookService.getAvailableBooks());
     }
 
-    // All authenticated users
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('USER', 'LIBRARIAN')")
     public ResponseEntity<BookDTO> getBookById(@PathVariable Long id) {
         return ResponseEntity.ok(bookService.getBookById(id));
     }
 
-    // LIBRARIAN only
+    @GetMapping("/autor/{autor}")
+    @PreAuthorize("hasAnyRole('USER', 'LIBRARIAN')")
+    public ResponseEntity<List<BookDTO>> getBooksByAutor(@PathVariable String autor) {
+        return ResponseEntity.ok(bookService.getBooksByAutor(autor));
+    }
+
+    @GetMapping("/exists/{isbn}")
+    @PreAuthorize("hasAnyRole('USER', 'LIBRARIAN')")
+    public ResponseEntity<Boolean> existsBook(@PathVariable String isbn) {
+        return ResponseEntity.ok(bookService.existsBook(isbn));
+    }
+
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('LIBRARIAN')")
     public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
         bookService.deleteBook(id);
         return ResponseEntity.ok().build();
     }
 
-    // LIBRARIAN only
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('LIBRARIAN')")
     public ResponseEntity<BookDTO> updateBook(@PathVariable Long id,
                                               @RequestParam(required = false) String title,
                                               @RequestParam(required = false) String autor,
                                               @RequestParam(required = false) Integer totalCopies,
                                               @RequestParam(required = false) Integer availableCopies) {
         return ResponseEntity.ok(bookService.updateBook(id, title, autor, totalCopies, availableCopies));
-    }
-
-    // All authenticated users
-    @GetMapping("/autor/{autor}")
-    public ResponseEntity<List<BookDTO>> getBooksByAutor(@PathVariable String autor) {
-        return ResponseEntity.ok(bookService.getBooksByAutor(autor));
-    }
-
-    @GetMapping("/exists/{isbn}")
-    public ResponseEntity<Boolean> existsBook(@PathVariable String isbn) {
-        return ResponseEntity.ok(bookService.existsBook(isbn));
     }
 }

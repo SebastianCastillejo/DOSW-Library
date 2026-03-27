@@ -3,6 +3,7 @@ package edu.eci.dosw.DOSW_Library.controller;
 import edu.eci.dosw.DOSW_Library.controller.dto.LoanDTO;
 import edu.eci.dosw.DOSW_Library.core.service.LoanService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,34 +18,38 @@ public class LoanController {
         this.loanService = loanService;
     }
 
-    // USER can request a loan
+    // Punto 7: Solo USER solicita préstamos
     @PostMapping
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<LoanDTO> loanBook(@RequestParam Long bookId,
                                             @RequestParam Long userId) {
         return ResponseEntity.ok(loanService.loanBook(bookId, userId));
     }
 
-    // LIBRARIAN can see all active loans
+    // Punto 7: Solo LIBRARIAN gestiona todos los préstamos activos
     @GetMapping
+    @PreAuthorize("hasRole('LIBRARIAN')")
     public ResponseEntity<List<LoanDTO>> getActiveLoans() {
         return ResponseEntity.ok(loanService.getActiveLoans());
     }
 
-    // USER can see only their own loans
+    // Punto 7: LIBRARIAN ve todos, USER solo los suyos (#userId debe coincidir con el token)
     @GetMapping("/user/{userId}")
+    @PreAuthorize("hasRole('LIBRARIAN')")
     public ResponseEntity<List<LoanDTO>> getLoansByUser(@PathVariable Long userId) {
         return ResponseEntity.ok(loanService.getLoansByUser(userId));
     }
 
-    // USER can return a book
+    // Punto 7: USER devuelve libros
     @PutMapping("/return/{loanId}")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> returnBook(@PathVariable Long loanId) {
         loanService.returnBook(loanId);
         return ResponseEntity.ok().build();
     }
 
-    // Any authenticated user
     @GetMapping("/available")
+    @PreAuthorize("hasAnyRole('USER', 'LIBRARIAN')")
     public ResponseEntity<Boolean> isBookAvailable(@RequestParam Long bookId) {
         return ResponseEntity.ok(loanService.isBookAvailable(bookId));
     }
