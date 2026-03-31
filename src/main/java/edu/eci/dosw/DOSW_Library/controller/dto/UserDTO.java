@@ -1,6 +1,6 @@
 package edu.eci.dosw.DOSW_Library.controller.dto;
 
-import edu.eci.dosw.DOSW_Library.persistence.entity.UserEntity.Role;
+import edu.eci.dosw.DOSW_Library.persistence.relational.entity.UserEntity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

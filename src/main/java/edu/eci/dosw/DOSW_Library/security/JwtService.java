@@ -6,7 +6,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
-import edu.eci.dosw.DOSW_Library.persistence.entity.UserEntity; // Ajusta según tu entidad
+import edu.eci.dosw.DOSW_Library.persistence.relational.entity.UserEntity; // Ajusta según tu entidad
 
 import java.security.Key;
 import java.util.Date;

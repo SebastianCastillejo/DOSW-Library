@@ -1,6 +1,6 @@
 package edu.eci.dosw.DOSW_Library.security.config;
 
-import edu.eci.dosw.DOSW_Library.persistence.repository.UserRepository;
+import edu.eci.dosw.DOSW_Library.persistence.relational.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

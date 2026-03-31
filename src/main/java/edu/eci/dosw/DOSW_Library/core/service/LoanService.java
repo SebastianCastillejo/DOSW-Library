@@ -4,11 +4,11 @@ import edu.eci.dosw.DOSW_Library.controller.dto.LoanDTO;
 import edu.eci.dosw.DOSW_Library.controller.mapper.LoanMapper;
 import edu.eci.dosw.DOSW_Library.core.exception.BookNotAvailableException;
 import edu.eci.dosw.DOSW_Library.core.exception.LoanNotFoundException;
-import edu.eci.dosw.DOSW_Library.persistence.entity.BookEntity;
-import edu.eci.dosw.DOSW_Library.persistence.entity.LoanEntity;
-import edu.eci.dosw.DOSW_Library.persistence.entity.LoanEntity.LoanStatus;
-import edu.eci.dosw.DOSW_Library.persistence.entity.UserEntity;
-import edu.eci.dosw.DOSW_Library.persistence.repository.LoanRepository;
+import edu.eci.dosw.DOSW_Library.persistence.relational.entity.BookEntity;
+import edu.eci.dosw.DOSW_Library.persistence.relational.entity.LoanEntity;
+import edu.eci.dosw.DOSW_Library.persistence.relational.entity.LoanEntity.LoanStatus;
+import edu.eci.dosw.DOSW_Library.persistence.relational.entity.UserEntity;
+import edu.eci.dosw.DOSW_Library.persistence.relational.repository.LoanRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

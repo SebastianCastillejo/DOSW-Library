@@ -3,9 +3,9 @@ package edu.eci.dosw.DOSW_Library.core.service;
 import edu.eci.dosw.DOSW_Library.controller.dto.UserDTO;
 import edu.eci.dosw.DOSW_Library.controller.mapper.UserMapper;
 import edu.eci.dosw.DOSW_Library.core.exception.UserNotFoundException;
-import edu.eci.dosw.DOSW_Library.persistence.entity.UserEntity;
-import edu.eci.dosw.DOSW_Library.persistence.entity.UserEntity.Role;
-import edu.eci.dosw.DOSW_Library.persistence.repository.UserRepository;
+import edu.eci.dosw.DOSW_Library.persistence.relational.entity.UserEntity;
+import edu.eci.dosw.DOSW_Library.persistence.relational.entity.UserEntity.Role;
+import edu.eci.dosw.DOSW_Library.persistence.relational.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

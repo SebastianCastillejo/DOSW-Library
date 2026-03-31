@@ -1,7 +1,7 @@
 package edu.eci.dosw.DOSW_Library.controller.mapper;
 
 import edu.eci.dosw.DOSW_Library.controller.dto.LoanDTO;
-import edu.eci.dosw.DOSW_Library.persistence.entity.LoanEntity;
+import edu.eci.dosw.DOSW_Library.persistence.relational.entity.LoanEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

@@ -1,6 +1,6 @@
 package edu.eci.dosw.DOSW_Library.controller.dto;
 
-import edu.eci.dosw.DOSW_Library.persistence.entity.LoanEntity.LoanStatus;
+import edu.eci.dosw.DOSW_Library.persistence.relational.entity.LoanEntity.LoanStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

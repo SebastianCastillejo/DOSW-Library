@@ -1,7 +1,7 @@
 package edu.eci.dosw.DOSW_Library.controller.mapper;
 
 import edu.eci.dosw.DOSW_Library.controller.dto.BookDTO;
-import edu.eci.dosw.DOSW_Library.persistence.entity.BookEntity;
+import edu.eci.dosw.DOSW_Library.persistence.relational.entity.BookEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

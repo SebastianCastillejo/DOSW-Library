@@ -1,7 +1,7 @@
 package edu.eci.dosw.DOSW_Library.security.service;
 
-import edu.eci.dosw.DOSW_Library.persistence.entity.UserEntity;
-import edu.eci.dosw.DOSW_Library.persistence.repository.UserRepository;
+import edu.eci.dosw.DOSW_Library.persistence.relational.entity.UserEntity;
+import edu.eci.dosw.DOSW_Library.persistence.relational.repository.UserRepository;
 import edu.eci.dosw.DOSW_Library.security.JwtService;
 import edu.eci.dosw.DOSW_Library.security.dto.AuthResponse;
 import edu.eci.dosw.DOSW_Library.security.dto.LoginRequest;

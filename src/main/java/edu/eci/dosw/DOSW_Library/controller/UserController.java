@@ -2,7 +2,7 @@ package edu.eci.dosw.DOSW_Library.controller;
 
 import edu.eci.dosw.DOSW_Library.controller.dto.UserDTO;
 import edu.eci.dosw.DOSW_Library.core.service.UserService;
-import edu.eci.dosw.DOSW_Library.persistence.entity.UserEntity.Role;
+import edu.eci.dosw.DOSW_Library.persistence.relational.entity.UserEntity.Role;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

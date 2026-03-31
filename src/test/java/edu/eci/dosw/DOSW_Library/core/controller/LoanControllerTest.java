@@ -5,7 +5,7 @@ import edu.eci.dosw.DOSW_Library.controller.dto.LoanDTO;
 import edu.eci.dosw.DOSW_Library.core.exception.BookNotAvailableException;
 import edu.eci.dosw.DOSW_Library.core.exception.LoanNotFoundException;
 import edu.eci.dosw.DOSW_Library.core.service.LoanService;
-import edu.eci.dosw.DOSW_Library.persistence.entity.LoanEntity.LoanStatus;
+import edu.eci.dosw.DOSW_Library.persistence.relational.entity.LoanEntity.LoanStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

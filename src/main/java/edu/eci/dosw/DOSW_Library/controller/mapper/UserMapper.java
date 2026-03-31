@@ -1,7 +1,7 @@
 package edu.eci.dosw.DOSW_Library.controller.mapper;
 
 import edu.eci.dosw.DOSW_Library.controller.dto.UserDTO;
-import edu.eci.dosw.DOSW_Library.persistence.entity.UserEntity;
+import edu.eci.dosw.DOSW_Library.persistence.relational.entity.UserEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
