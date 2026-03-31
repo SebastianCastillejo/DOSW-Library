@@ -34,7 +34,14 @@ class ValidatorTest {
 
     @Test
     void testBookValidator_Book_Exitoso() {
-        Book book = new Book("Clean Code", "Martin", "B001");
+        Book book = Book.builder()
+                .id("B001")
+                .title("Clean Code")
+                .autor("Martin")
+                .isbn("123")
+                .totalCopies(5)
+                .availableCopies(3)
+                .build();
         assertDoesNotThrow(() -> BookValidator.validate(book));
     }
 
@@ -65,7 +72,14 @@ class ValidatorTest {
 
     @Test
     void testUserValidator_User_Exitoso() {
-        User user = new User("Sebastian", "U001");
+        User user = User.builder()
+                .id("U001")
+                .name("Sebastian")
+                .username("seba123")
+                .email("seba@mail.com")
+                .password("pass")
+                .role("USER")
+                .build();
         assertDoesNotThrow(() -> UserValidator.validate(user));
     }
 
@@ -79,21 +93,37 @@ class ValidatorTest {
 
     @Test
     void testLoanValidator_Exitoso() {
-        Book book = new Book("Clean Code", "Martin", "B001");
-        User user = new User("Sebastian", "U001");
+        Book book = Book.builder()
+                .id("B001").title("Clean Code")
+                .autor("Martin").isbn("123")
+                .totalCopies(5).availableCopies(3)
+                .build();
+        User user = User.builder()
+                .id("U001").name("Sebastian")
+                .username("seba123").email("seba@mail.com")
+                .password("pass").role("USER")
+                .build();
         assertDoesNotThrow(() -> LoanValidator.validate(book, user));
     }
 
     @Test
     void testLoanValidator_BookNulo_LanzaExcepcion() {
-        User user = new User("Sebastian", "U001");
+        User user = User.builder()
+                .id("U001").name("Sebastian")
+                .username("seba123").email("seba@mail.com")
+                .password("pass").role("USER")
+                .build();
         assertThrows(IllegalArgumentException.class,
                 () -> LoanValidator.validate(null, user));
     }
 
     @Test
     void testLoanValidator_UserNulo_LanzaExcepcion() {
-        Book book = new Book("Clean Code", "Martin", "B001");
+        Book book = Book.builder()
+                .id("B001").title("Clean Code")
+                .autor("Martin").isbn("123")
+                .totalCopies(5).availableCopies(3)
+                .build();
         assertThrows(IllegalArgumentException.class,
                 () -> LoanValidator.validate(book, null));
     }
