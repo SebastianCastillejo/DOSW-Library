@@ -1,0 +1,32 @@
+spring:
+  profiles:
+    active: mongo
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/biblioteca_db
+    username: postgres
+    password: 12345
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  data:
+    mongodb:
+      uri: mongodb+srv://castillejoangulo:Vien2023@cluster0.0cw5yye.mongodb.net/?appName=Cluster0
+      database: biblioteca_db
+
+server:
+  port: 8443
+  ssl:
+    key-store: classpath:library-key.p12
+    key-store-password: "123456"
+    key-store-type: PKCS12
+    key-alias: library

@@ -1,37 +1,22 @@
 package edu.eci.dosw.DOSW_Library.core.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Book {
+    private String id;
     private String title;
     private String autor;
-    private String id;
-
-    public Book(String title, String autor, String id) {
-        this.title = title;
-        this.autor = autor;
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getAutor() {
-        return autor;
-    }
-
-    public void setAutor(String autor) {
-        this.autor = autor;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
+    private String isbn;
+    private Integer totalCopies;
+    private Integer availableCopies;
 }
