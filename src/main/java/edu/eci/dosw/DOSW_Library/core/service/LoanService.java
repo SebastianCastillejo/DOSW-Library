@@ -4,11 +4,11 @@ import edu.eci.dosw.DOSW_Library.controller.dto.LoanDTO;
 import edu.eci.dosw.DOSW_Library.controller.mapper.LoanMapper;
 import edu.eci.dosw.DOSW_Library.core.exception.BookNotAvailableException;
 import edu.eci.dosw.DOSW_Library.core.exception.LoanNotFoundException;
-import edu.eci.dosw.DOSW_Library.persistence.relational.entity.BookEntity;
-import edu.eci.dosw.DOSW_Library.persistence.relational.entity.LoanEntity;
-import edu.eci.dosw.DOSW_Library.persistence.relational.entity.LoanEntity.LoanStatus;
-import edu.eci.dosw.DOSW_Library.persistence.relational.entity.UserEntity;
-import edu.eci.dosw.DOSW_Library.persistence.relational.repository.LoanRepository;
+import edu.eci.dosw.DOSW_Library.core.model.Book;
+import edu.eci.dosw.DOSW_Library.core.model.Loan;
+import edu.eci.dosw.DOSW_Library.core.model.Status;
+import edu.eci.dosw.DOSW_Library.core.model.User;
+import edu.eci.dosw.DOSW_Library.persistence.repository.LoanRepositoryPort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,12 +18,12 @@ import java.util.List;
 @Service
 public class LoanService {
 
-    private final LoanRepository loanRepository;
+    private final LoanRepositoryPort loanRepository;
     private final BookService bookService;
     private final UserService userService;
     private final LoanMapper loanMapper;
 
-    public LoanService(LoanRepository loanRepository,
+    public LoanService(LoanRepositoryPort loanRepository,
                        BookService bookService,
                        UserService userService,
                        LoanMapper loanMapper) {
@@ -33,60 +33,55 @@ public class LoanService {
         this.loanMapper = loanMapper;
     }
 
-    // USER puede solicitar préstamo
     @Transactional
-    public LoanDTO loanBook(Long bookId, Long userId) {
-        BookEntity book = bookService.getEntityById(bookId);
-        UserEntity user = userService.getEntityById(userId);
+    public LoanDTO loanBook(String bookId, String userId) {
+        Book book = bookService.getModelById(String.valueOf(bookId));
+        User user = userService.getModelById(String.valueOf(userId));
 
         if (book.getAvailableCopies() <= 0) {
             throw new BookNotAvailableException(String.valueOf(bookId));
         }
 
-        // Reducir disponibilidad y guardar
         book.setAvailableCopies(book.getAvailableCopies() - 1);
         bookService.save(book);
 
-        LoanEntity loan = LoanEntity.builder()
-                .book(book)
-                .user(user)
+        Loan loan = Loan.builder()
+                .bookId(String.valueOf(bookId))
+                .userId(String.valueOf(userId))
                 .loanDate(LocalDate.now())
-                .status(LoanStatus.ACTIVE)
+                .status(Status.ACTIVE)
                 .build();
 
         return loanMapper.toDTO(loanRepository.save(loan));
     }
 
-    // LIBRARIAN puede ver todos los préstamos activos
     public List<LoanDTO> getActiveLoans() {
-        return loanMapper.toDTOList(loanRepository.findByStatus(LoanStatus.ACTIVE));
+        return loanMapper.toDTOList(loanRepository.findActive());
     }
 
-    // USER puede ver solo sus propios préstamos
-    public List<LoanDTO> getLoansByUser(Long userId) {
-        return loanMapper.toDTOList(loanRepository.findByUserId(userId));
+    public List<LoanDTO> getLoansByUser(String userId) {
+        return loanMapper.toDTOList(loanRepository.findByUserId(String.valueOf(userId)));
     }
 
-    // USER puede devolver un libro
     @Transactional
-    public void returnBook(Long loanId) {
-        LoanEntity loan = loanRepository.findByIdAndStatus(loanId, LoanStatus.ACTIVE)
+    public void returnBook(String loanId) {
+        Loan loan = loanRepository.findById(String.valueOf(loanId))
+                .filter(l -> l.getStatus() == Status.ACTIVE)
                 .orElseThrow(() -> new LoanNotFoundException(String.valueOf(loanId), "active"));
 
-        // Aumentar disponibilidad, sin superar totalCopies
-        BookEntity book = loan.getBook();
+        Book book = bookService.getModelById(loan.getBookId());
         if (book.getAvailableCopies() < book.getTotalCopies()) {
             book.setAvailableCopies(book.getAvailableCopies() + 1);
             bookService.save(book);
         }
 
-        loan.setStatus(LoanStatus.RETURNED);
+        loan.setStatus(Status.RETURNED);
         loan.setReturnDate(LocalDate.now());
         loanRepository.save(loan);
     }
 
-    public boolean isBookAvailable(Long bookId) {
-        BookEntity book = bookService.getEntityById(bookId);
+    public boolean isBookAvailable(String bookId) {
+        Book book = bookService.getModelById(String.valueOf(bookId));
         return book.getAvailableCopies() > 0;
     }
 }

@@ -18,39 +18,35 @@ public class LoanController {
         this.loanService = loanService;
     }
 
-    // Punto 7: Solo USER solicita préstamos
     @PostMapping
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<LoanDTO> loanBook(@RequestParam Long bookId,
-                                            @RequestParam Long userId) {
+    public ResponseEntity<LoanDTO> loanBook(@RequestParam String bookId,
+                                            @RequestParam String userId) {
         return ResponseEntity.ok(loanService.loanBook(bookId, userId));
     }
 
-    // Punto 7: Solo LIBRARIAN gestiona todos los préstamos activos
     @GetMapping
     @PreAuthorize("hasRole('LIBRARIAN')")
     public ResponseEntity<List<LoanDTO>> getActiveLoans() {
         return ResponseEntity.ok(loanService.getActiveLoans());
     }
 
-    // Punto 7: LIBRARIAN ve todos, USER solo los suyos (#userId debe coincidir con el token)
     @GetMapping("/user/{userId}")
     @PreAuthorize("hasRole('LIBRARIAN')")
-    public ResponseEntity<List<LoanDTO>> getLoansByUser(@PathVariable Long userId) {
+    public ResponseEntity<List<LoanDTO>> getLoansByUser(@PathVariable String userId) {
         return ResponseEntity.ok(loanService.getLoansByUser(userId));
     }
 
-    // Punto 7: USER devuelve libros
     @PutMapping("/return/{loanId}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Void> returnBook(@PathVariable Long loanId) {
+    public ResponseEntity<Void> returnBook(@PathVariable String loanId) {
         loanService.returnBook(loanId);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/available")
     @PreAuthorize("hasAnyRole('USER', 'LIBRARIAN')")
-    public ResponseEntity<Boolean> isBookAvailable(@RequestParam Long bookId) {
+    public ResponseEntity<Boolean> isBookAvailable(@RequestParam String bookId) {
         return ResponseEntity.ok(loanService.isBookAvailable(bookId));
     }
 }

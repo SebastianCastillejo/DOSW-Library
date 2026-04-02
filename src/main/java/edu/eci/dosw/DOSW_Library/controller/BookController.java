@@ -18,7 +18,6 @@ public class BookController {
         this.bookService = bookService;
     }
 
-    // Punto 7: Solo LIBRARIAN gestiona el inventario
     @PostMapping
     @PreAuthorize("hasRole('LIBRARIAN')")
     public ResponseEntity<BookDTO> addBook(@RequestParam String title,
@@ -29,7 +28,6 @@ public class BookController {
         return ResponseEntity.ok(bookService.addBook(title, autor, isbn, totalCopies, availableCopies));
     }
 
-    // Punto 7: Usuarios y Librarians pueden consultar
     @GetMapping
     @PreAuthorize("hasAnyRole('USER', 'LIBRARIAN')")
     public ResponseEntity<List<BookDTO>> getAllBooks() {
@@ -44,7 +42,7 @@ public class BookController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('USER', 'LIBRARIAN')")
-    public ResponseEntity<BookDTO> getBookById(@PathVariable Long id) {
+    public ResponseEntity<BookDTO> getBookById(@PathVariable String id) {
         return ResponseEntity.ok(bookService.getBookById(id));
     }
 
@@ -62,14 +60,14 @@ public class BookController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('LIBRARIAN')")
-    public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteBook(@PathVariable String id) {
         bookService.deleteBook(id);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('LIBRARIAN')")
-    public ResponseEntity<BookDTO> updateBook(@PathVariable Long id,
+    public ResponseEntity<BookDTO> updateBook(@PathVariable String id,
                                               @RequestParam(required = false) String title,
                                               @RequestParam(required = false) String autor,
                                               @RequestParam(required = false) Integer totalCopies,

@@ -1,6 +1,7 @@
 package edu.eci.dosw.DOSW_Library.controller.mapper;
 
 import edu.eci.dosw.DOSW_Library.controller.dto.LoanDTO;
+import edu.eci.dosw.DOSW_Library.core.model.Loan;
 import edu.eci.dosw.DOSW_Library.persistence.relational.entity.LoanEntity;
 import org.springframework.stereotype.Component;
 
@@ -10,28 +11,18 @@ import java.util.stream.Collectors;
 @Component
 public class LoanMapper {
 
-    private final BookMapper bookMapper;
-    private final UserMapper userMapper;
-
-    public LoanMapper(BookMapper bookMapper, UserMapper userMapper) {
-        this.bookMapper = bookMapper;
-        this.userMapper = userMapper;
-    }
-
-    public LoanDTO toDTO(LoanEntity entity) {
-        if (entity == null) return null;
+    public LoanDTO toDTO(Loan loan) {
+        if (loan == null) return null;
         return LoanDTO.builder()
-                .id(entity.getId())
-                .book(bookMapper.toDTO(entity.getBook()))
-                .user(userMapper.toDTO(entity.getUser()))
-                .loanDate(entity.getLoanDate())
-                .returnDate(entity.getReturnDate())
-                .status(entity.getStatus())
+                .id(loan.getId())
+                .loanDate(loan.getLoanDate())
+                .returnDate(loan.getReturnDate())
+                .status(loan.getStatus() != null ? LoanEntity.LoanStatus.valueOf(loan.getStatus().name()) : null)
                 .build();
     }
 
-    public List<LoanDTO> toDTOList(List<LoanEntity> entities) {
-        return entities.stream()
+    public List<LoanDTO> toDTOList(List<Loan> loans) {
+        return loans.stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }

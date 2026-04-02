@@ -19,7 +19,6 @@ public class UserController {
         this.userService = userService;
     }
 
-    // Punto 7: Solo LIBRARIAN registra nuevos usuarios
     @PostMapping
     @PreAuthorize("hasRole('LIBRARIAN')")
     public ResponseEntity<UserDTO> addUser(@RequestParam String name,
@@ -30,30 +29,28 @@ public class UserController {
         return ResponseEntity.ok(userService.addUser(name, username, password, email, role));
     }
 
-    // Punto 7: Solo LIBRARIAN lista todos los usuarios
     @GetMapping
     @PreAuthorize("hasRole('LIBRARIAN')")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    // Punto 7: Restricción de acceso a info propia o admin
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('LIBRARIAN')")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserDTO> getUserById(@PathVariable String id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('LIBRARIAN')")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable String id) {
         userService.deleteUser(id);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('LIBRARIAN')") // Operación administrativa
-    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id,
+    @PreAuthorize("hasRole('LIBRARIAN')")
+    public ResponseEntity<UserDTO> updateUser(@PathVariable String id,
                                               @RequestParam(required = false) String name,
                                               @RequestParam(required = false) String email) {
         return ResponseEntity.ok(userService.updateUser(id, name, email));

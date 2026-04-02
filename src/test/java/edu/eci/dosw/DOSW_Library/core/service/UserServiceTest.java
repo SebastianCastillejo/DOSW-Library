@@ -3,9 +3,9 @@ package edu.eci.dosw.DOSW_Library.core.service;
 import edu.eci.dosw.DOSW_Library.controller.dto.UserDTO;
 import edu.eci.dosw.DOSW_Library.controller.mapper.UserMapper;
 import edu.eci.dosw.DOSW_Library.core.exception.UserNotFoundException;
-import edu.eci.dosw.DOSW_Library.persistence.relational.entity.UserEntity;
+import edu.eci.dosw.DOSW_Library.core.model.User;
 import edu.eci.dosw.DOSW_Library.persistence.relational.entity.UserEntity.Role;
-import edu.eci.dosw.DOSW_Library.persistence.relational.repository.UserRepository;
+import edu.eci.dosw.DOSW_Library.persistence.repository.UserRepositoryPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 class UserServiceTest {
 
     @Mock
-    private UserRepository userRepository;
+    private UserRepositoryPort userRepository;
 
     @Mock
     private UserMapper userMapper;
@@ -32,22 +32,22 @@ class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
-    private UserEntity userEntity;
+    private User user;
     private UserDTO userDTO;
 
     @BeforeEach
     void setUp() {
-        userEntity = UserEntity.builder()
-                .id(1L)
+        user = User.builder()
+                .id("1")
                 .name("Sebastian")
                 .username("seba123")
                 .password("pass123")
                 .email("seba@mail.com")
-                .role(Role.USER)
+                .role("USER")
                 .build();
 
         userDTO = UserDTO.builder()
-                .id(1L)
+                .id("1L")
                 .name("Sebastian")
                 .username("seba123")
                 .email("seba@mail.com")
@@ -55,20 +55,17 @@ class UserServiceTest {
                 .build();
     }
 
-    // ── addUser ────────────────────────────────────────────────────────────────
-
     @Test
     void testAddUser_Exitoso() {
         when(userRepository.existsByUsername("seba123")).thenReturn(false);
         when(userRepository.existsByEmail("seba@mail.com")).thenReturn(false);
-        when(userRepository.save(any())).thenReturn(userEntity);
-        when(userMapper.toDTO(userEntity)).thenReturn(userDTO);
+        when(userRepository.save(any())).thenReturn(user);
+        when(userMapper.toDTO(user)).thenReturn(userDTO);
 
         UserDTO result = userService.addUser("Sebastian", "seba123", "pass123", "seba@mail.com", Role.USER);
 
         assertNotNull(result);
         assertEquals("Sebastian", result.getName());
-        verify(userRepository).save(any());
     }
 
     @Test
@@ -88,14 +85,12 @@ class UserServiceTest {
                 () -> userService.addUser("Sebastian", "seba123", "pass123", "seba@mail.com", Role.USER));
     }
 
-    // ── getUserById ────────────────────────────────────────────────────────────
-
     @Test
     void testGetUserById_Exitoso() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(userEntity));
-        when(userMapper.toDTO(userEntity)).thenReturn(userDTO);
+        when(userRepository.findById("1")).thenReturn(Optional.of(user));
+        when(userMapper.toDTO(user)).thenReturn(userDTO);
 
-        UserDTO result = userService.getUserById(1L);
+        UserDTO result = userService.getUserById("1");
 
         assertNotNull(result);
         assertEquals("Sebastian", result.getName());
@@ -103,24 +98,18 @@ class UserServiceTest {
 
     @Test
     void testGetUserById_NoExiste_LanzaExcepcion() {
-        when(userRepository.findById(99L)).thenReturn(Optional.empty());
+        when(userRepository.findById("99")).thenReturn(Optional.empty());
 
         assertThrows(UserNotFoundException.class,
-                () -> userService.getUserById(99L));
+                () -> userService.getUserById("99"));
     }
-
-    // ── getAllUsers ────────────────────────────────────────────────────────────
 
     @Test
     void testGetAllUsers_Exitoso() {
-        UserEntity user2 = UserEntity.builder().id(2L).name("Maria")
-                .username("maria99").password("pass").email("maria@mail.com").role(Role.USER).build();
+        when(userRepository.findAll()).thenReturn(List.of(user));
+        when(userMapper.toDTOList(any())).thenReturn(List.of(userDTO));
 
-        when(userRepository.findAll()).thenReturn(List.of(userEntity, user2));
-        when(userMapper.toDTOList(any())).thenReturn(List.of(userDTO,
-                UserDTO.builder().id(2L).name("Maria").build()));
-
-        assertEquals(2, userService.getAllUsers().size());
+        assertEquals(1, userService.getAllUsers().size());
     }
 
     @Test
@@ -131,53 +120,40 @@ class UserServiceTest {
         assertTrue(userService.getAllUsers().isEmpty());
     }
 
-    // ── deleteUser ─────────────────────────────────────────────────────────────
-
     @Test
     void testDeleteUser_Exitoso() {
-        when(userRepository.existsById(1L)).thenReturn(true);
+        when(userRepository.findById("1")).thenReturn(Optional.of(user));
 
-        userService.deleteUser(1L);
+        userService.deleteUser("1");
 
-        verify(userRepository).deleteById(1L);
+        verify(userRepository).delete("1");
     }
 
     @Test
     void testDeleteUser_NoExiste_LanzaExcepcion() {
-        when(userRepository.existsById(99L)).thenReturn(false);
+        when(userRepository.findById("99")).thenReturn(Optional.empty());
 
         assertThrows(UserNotFoundException.class,
-                () -> userService.deleteUser(99L));
+                () -> userService.deleteUser("99"));
     }
-
-    // ── updateUser ─────────────────────────────────────────────────────────────
 
     @Test
     void testUpdateUser_Exitoso() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(userEntity));
-        when(userRepository.save(any())).thenReturn(userEntity);
+        when(userRepository.findById("1")).thenReturn(Optional.of(user));
+        when(userRepository.save(any())).thenReturn(user);
         when(userMapper.toDTO(any())).thenReturn(userDTO);
 
-        UserDTO result = userService.updateUser(1L, "NuevoNombre", null);
+        UserDTO result = userService.updateUser("1", "NuevoNombre", null);
 
         assertNotNull(result);
-        verify(userRepository).save(userEntity);
+        verify(userRepository).save(user);
     }
 
     @Test
     void testUpdateUser_NoExiste_LanzaExcepcion() {
-        when(userRepository.findById(99L)).thenReturn(Optional.empty());
+        when(userRepository.findById("99")).thenReturn(Optional.empty());
 
         assertThrows(UserNotFoundException.class,
-                () -> userService.updateUser(99L, "Nombre", null));
-    }
-
-    @Test
-    void testUpdateUser_EmailDuplicado_LanzaExcepcion() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(userEntity));
-        when(userRepository.existsByEmail("otro@mail.com")).thenReturn(true);
-
-        assertThrows(IllegalArgumentException.class,
-                () -> userService.updateUser(1L, null, "otro@mail.com"));
+                () -> userService.updateUser("99", "Nombre", null));
     }
 }

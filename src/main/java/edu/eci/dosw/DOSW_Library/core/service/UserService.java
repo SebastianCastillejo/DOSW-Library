@@ -3,9 +3,9 @@ package edu.eci.dosw.DOSW_Library.core.service;
 import edu.eci.dosw.DOSW_Library.controller.dto.UserDTO;
 import edu.eci.dosw.DOSW_Library.controller.mapper.UserMapper;
 import edu.eci.dosw.DOSW_Library.core.exception.UserNotFoundException;
-import edu.eci.dosw.DOSW_Library.persistence.relational.entity.UserEntity;
+import edu.eci.dosw.DOSW_Library.core.model.User;
 import edu.eci.dosw.DOSW_Library.persistence.relational.entity.UserEntity.Role;
-import edu.eci.dosw.DOSW_Library.persistence.relational.repository.UserRepository;
+import edu.eci.dosw.DOSW_Library.persistence.repository.UserRepositoryPort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,15 +13,14 @@ import java.util.List;
 @Service
 public class UserService {
 
-    private final UserRepository userRepository;
+    private final UserRepositoryPort userRepository;
     private final UserMapper userMapper;
 
-    public UserService(UserRepository userRepository, UserMapper userMapper) {
+    public UserService(UserRepositoryPort userRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
     }
 
-    // Solo LIBRARIAN puede registrar usuarios
     public UserDTO addUser(String name, String username, String password, String email, Role role) {
         if (userRepository.existsByUsername(username)) {
             throw new IllegalArgumentException("Username already exists: " + username);
@@ -30,40 +29,36 @@ public class UserService {
             throw new IllegalArgumentException("Email already exists: " + email);
         }
 
-        UserEntity entity = UserEntity.builder()
+        User user = User.builder()
                 .name(name)
                 .username(username)
-                .password(password) // En Parte 2 esto se encripta con BCrypt
+                .password(password)
                 .email(email)
-                .role(role)
+                .role(role.name())
                 .build();
 
-        return userMapper.toDTO(userRepository.save(entity));
+        return userMapper.toDTO(userRepository.save(user));
     }
 
-    // Solo LIBRARIAN puede ver todos los usuarios
     public List<UserDTO> getAllUsers() {
         return userMapper.toDTOList(userRepository.findAll());
     }
 
-    public UserDTO getUserById(Long id) {
+    public UserDTO getUserById(String id) {
         return userRepository.findById(id)
                 .map(userMapper::toDTO)
-                .orElseThrow(() -> new UserNotFoundException(String.valueOf(id)));
+                .orElseThrow(() -> new UserNotFoundException(id));
     }
 
-    // Solo LIBRARIAN puede eliminar usuarios
-    public void deleteUser(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException(String.valueOf(id));
-        }
-        userRepository.deleteById(id);
+    public void deleteUser(String id) {
+        userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+        userRepository.delete(id);
     }
 
-    // Solo LIBRARIAN puede actualizar usuarios
-    public UserDTO updateUser(Long id, String name, String email) {
-        UserEntity user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(String.valueOf(id)));
+    public UserDTO updateUser(String id, String name, String email) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
 
         if (name != null && !name.isBlank()) user.setName(name);
         if (email != null && !email.isBlank()) {
@@ -76,9 +71,8 @@ public class UserService {
         return userMapper.toDTO(userRepository.save(user));
     }
 
-    // Método interno para LoanService
-    public UserEntity getEntityById(Long id) {
+    public User getModelById(String id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(String.valueOf(id)));
+                .orElseThrow(() -> new UserNotFoundException(id));
     }
 }

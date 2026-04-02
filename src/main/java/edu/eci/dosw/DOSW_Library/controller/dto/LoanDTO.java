@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoanDTO {
-    private Long id;
+    private String id;
     private BookDTO book;
     private UserDTO user;
     private LocalDate loanDate;

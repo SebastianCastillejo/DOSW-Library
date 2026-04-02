@@ -34,7 +34,7 @@ class LoanControllerTest {
     @BeforeEach
     void setUp() {
         loanDTO = LoanDTO.builder()
-                .id(1L)
+                .id("1L")
                 .loanDate(LocalDate.now())
                 .status(LoanStatus.ACTIVE)
                 .build();
@@ -42,9 +42,9 @@ class LoanControllerTest {
 
     @Test
     void testLoanBook_Exitoso() {
-        when(loanService.loanBook(1L, 1L)).thenReturn(loanDTO);
+        when(loanService.loanBook("1L", "1L")).thenReturn(loanDTO);
 
-        ResponseEntity<LoanDTO> response = loanController.loanBook(1L, 1L);
+        ResponseEntity<LoanDTO> response = loanController.loanBook("1L", "1L");
 
         assertEquals(200, response.getStatusCode().value());
         assertNotNull(response.getBody());
@@ -53,11 +53,11 @@ class LoanControllerTest {
 
     @Test
     void testLoanBook_LibroSinDisponibilidad_LanzaExcepcion() {
-        when(loanService.loanBook(1L, 1L))
+        when(loanService.loanBook("1L", "1L"))
                 .thenThrow(new BookNotAvailableException("1"));
 
         assertThrows(BookNotAvailableException.class,
-                () -> loanController.loanBook(1L, 1L));
+                () -> loanController.loanBook("1L", "1L"));
     }
 
     @Test
@@ -83,9 +83,9 @@ class LoanControllerTest {
 
     @Test
     void testGetLoansByUser_Exitoso() {
-        when(loanService.getLoansByUser(1L)).thenReturn(List.of(loanDTO));
+        when(loanService.getLoansByUser("1L")).thenReturn(List.of(loanDTO));
 
-        ResponseEntity<List<LoanDTO>> response = loanController.getLoansByUser(1L);
+        ResponseEntity<List<LoanDTO>> response = loanController.getLoansByUser("1L");
 
         assertEquals(200, response.getStatusCode().value());
         assert response.getBody() != null;
@@ -94,28 +94,28 @@ class LoanControllerTest {
 
     @Test
     void testReturnBook_Exitoso() {
-        doNothing().when(loanService).returnBook(1L);
+        doNothing().when(loanService).returnBook("1L");
 
-        ResponseEntity<Void> response = loanController.returnBook(1L);
+        ResponseEntity<Void> response = loanController.returnBook("1L");
 
         assertEquals(200, response.getStatusCode().value());
-        verify(loanService).returnBook(1L);
+        verify(loanService).returnBook("1L");
     }
 
     @Test
     void testReturnBook_PrestamoNoActivo_LanzaExcepcion() {
         doThrow(new LoanNotFoundException("1", "active"))
-                .when(loanService).returnBook(99L);
+                .when(loanService).returnBook("99L");
 
         assertThrows(LoanNotFoundException.class,
-                () -> loanController.returnBook(99L));
+                () -> loanController.returnBook("99L"));
     }
 
     @Test
     void testIsBookAvailable_Disponible() {
-        when(loanService.isBookAvailable(1L)).thenReturn(true);
+        when(loanService.isBookAvailable("1L")).thenReturn(true);
 
-        ResponseEntity<Boolean> response = loanController.isBookAvailable(1L);
+        ResponseEntity<Boolean> response = loanController.isBookAvailable("1L");
 
         assertEquals(200, response.getStatusCode().value());
         assertEquals(Boolean.TRUE, response.getBody());
@@ -123,9 +123,9 @@ class LoanControllerTest {
 
     @Test
     void testIsBookAvailable_NoDisponible() {
-        when(loanService.isBookAvailable(1L)).thenReturn(false);
+        when(loanService.isBookAvailable("1L")).thenReturn(false);
 
-        ResponseEntity<Boolean> response = loanController.isBookAvailable(1L);
+        ResponseEntity<Boolean> response = loanController.isBookAvailable("1L");
 
         assertNotEquals(Boolean.TRUE, response.getBody());
     }

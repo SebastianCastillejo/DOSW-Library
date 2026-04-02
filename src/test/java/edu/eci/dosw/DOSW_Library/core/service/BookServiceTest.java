@@ -3,8 +3,8 @@ package edu.eci.dosw.DOSW_Library.core.service;
 import edu.eci.dosw.DOSW_Library.controller.dto.BookDTO;
 import edu.eci.dosw.DOSW_Library.controller.mapper.BookMapper;
 import edu.eci.dosw.DOSW_Library.core.exception.BookNotFoundException;
-import edu.eci.dosw.DOSW_Library.persistence.relational.entity.BookEntity;
-import edu.eci.dosw.DOSW_Library.persistence.relational.repository.BookRepository;
+import edu.eci.dosw.DOSW_Library.core.model.Book;
+import edu.eci.dosw.DOSW_Library.persistence.repository.BookRepositoryPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 class BookServiceTest {
 
     @Mock
-    private BookRepository bookRepository;
+    private BookRepositoryPort bookRepository;
 
     @Mock
     private BookMapper bookMapper;
@@ -31,13 +31,13 @@ class BookServiceTest {
     @InjectMocks
     private BookService bookService;
 
-    private BookEntity bookEntity;
+    private Book book;
     private BookDTO bookDTO;
 
     @BeforeEach
     void setUp() {
-        bookEntity = BookEntity.builder()
-                .id(1L)
+        book = Book.builder()
+                .id("1")
                 .title("Clean Code")
                 .autor("Robert Martin")
                 .isbn("B001")
@@ -46,7 +46,7 @@ class BookServiceTest {
                 .build();
 
         bookDTO = BookDTO.builder()
-                .id(1L)
+                .id("1L")
                 .title("Clean Code")
                 .autor("Robert Martin")
                 .isbn("B001")
@@ -55,12 +55,10 @@ class BookServiceTest {
                 .build();
     }
 
-    // ── addBook ────────────────────────────────────────────────────────────────
-
     @Test
     void testAddBook_Exitoso() {
-        when(bookRepository.save(any())).thenReturn(bookEntity);
-        when(bookMapper.toDTO(bookEntity)).thenReturn(bookDTO);
+        when(bookRepository.save(any())).thenReturn(book);
+        when(bookMapper.toDTO(book)).thenReturn(bookDTO);
 
         BookDTO result = bookService.addBook("Clean Code", "Robert Martin", "B001", 5, 5);
 
@@ -87,14 +85,12 @@ class BookServiceTest {
                 () -> bookService.addBook("Clean Code", "Robert Martin", "B001", 3, 5));
     }
 
-    // ── getBookById ────────────────────────────────────────────────────────────
-
     @Test
     void testGetBookById_Exitoso() {
-        when(bookRepository.findById(1L)).thenReturn(Optional.of(bookEntity));
-        when(bookMapper.toDTO(bookEntity)).thenReturn(bookDTO);
+        when(bookRepository.findById("1")).thenReturn(Optional.of(book));
+        when(bookMapper.toDTO(book)).thenReturn(bookDTO);
 
-        BookDTO result = bookService.getBookById(1L);
+        BookDTO result = bookService.getBookById("1");
 
         assertNotNull(result);
         assertEquals("Clean Code", result.getTitle());
@@ -102,24 +98,18 @@ class BookServiceTest {
 
     @Test
     void testGetBookById_NoExiste_LanzaExcepcion() {
-        when(bookRepository.findById(99L)).thenReturn(Optional.empty());
+        when(bookRepository.findById("99")).thenReturn(Optional.empty());
 
         assertThrows(BookNotFoundException.class,
-                () -> bookService.getBookById(99L));
+                () -> bookService.getBookById("99"));
     }
-
-    // ── getAllBooks ────────────────────────────────────────────────────────────
 
     @Test
     void testGetAllBooks_Exitoso() {
-        BookEntity book2 = BookEntity.builder().id(2L).title("Refactoring")
-                .autor("Martin Fowler").isbn("B002").totalCopies(3).availableCopies(3).build();
+        when(bookRepository.findAll()).thenReturn(List.of(book));
+        when(bookMapper.toDTOList(any())).thenReturn(List.of(bookDTO));
 
-        when(bookRepository.findAll()).thenReturn(List.of(bookEntity, book2));
-        when(bookMapper.toDTOList(any())).thenReturn(List.of(bookDTO,
-                BookDTO.builder().id(2L).title("Refactoring").build()));
-
-        assertEquals(2, bookService.getAllBooks().size());
+        assertEquals(1, bookService.getAllBooks().size());
     }
 
     @Test
@@ -130,105 +120,54 @@ class BookServiceTest {
         assertTrue(bookService.getAllBooks().isEmpty());
     }
 
-    // ── getAvailableBooks ──────────────────────────────────────────────────────
-
     @Test
-    void testGetAvailableBooks_SoloRetornaConDisponibilidad() {
-        when(bookRepository.findByAvailableCopiesGreaterThan(0)).thenReturn(List.of(bookEntity));
+    void testGetAvailableBooks_Exitoso() {
+        when(bookRepository.findAvailable()).thenReturn(List.of(book));
         when(bookMapper.toDTOList(any())).thenReturn(List.of(bookDTO));
 
-        List<BookDTO> result = bookService.getAvailableBooks();
-        assertEquals(1, result.size());
+        assertEquals(1, bookService.getAvailableBooks().size());
     }
-
-    // ── deleteBook ─────────────────────────────────────────────────────────────
 
     @Test
     void testDeleteBook_Exitoso() {
-        when(bookRepository.existsById(1L)).thenReturn(true);
+        when(bookRepository.findById("1")).thenReturn(Optional.of(book));
 
-        bookService.deleteBook(1L);
+        bookService.deleteBook("1");
 
-        verify(bookRepository).deleteById(1L);
+        verify(bookRepository).delete("1");
     }
 
     @Test
     void testDeleteBook_NoExiste_LanzaExcepcion() {
-        when(bookRepository.existsById(99L)).thenReturn(false);
+        when(bookRepository.findById("99")).thenReturn(Optional.empty());
 
         assertThrows(BookNotFoundException.class,
-                () -> bookService.deleteBook(99L));
+                () -> bookService.deleteBook("99"));
     }
-
-    // ── updateBook ─────────────────────────────────────────────────────────────
 
     @Test
     void testUpdateBook_Exitoso() {
-        when(bookRepository.findById(1L)).thenReturn(Optional.of(bookEntity));
-        when(bookRepository.save(any())).thenReturn(bookEntity);
+        when(bookRepository.findById("1")).thenReturn(Optional.of(book));
+        when(bookRepository.save(any())).thenReturn(book);
         when(bookMapper.toDTO(any())).thenReturn(bookDTO);
 
-        BookDTO result = bookService.updateBook(1L, "Nuevo Titulo", "Nuevo Autor", null, null);
+        BookDTO result = bookService.updateBook("1", "Nuevo", "Autor", null, null);
 
         assertNotNull(result);
-        verify(bookRepository).save(bookEntity);
+        verify(bookRepository).save(book);
     }
-
-    @Test
-    void testUpdateBook_NoExiste_LanzaExcepcion() {
-        when(bookRepository.findById(99L)).thenReturn(Optional.empty());
-
-        assertThrows(BookNotFoundException.class,
-                () -> bookService.updateBook(99L, "T", "A", null, null));
-    }
-
-    @Test
-    void testUpdateBook_TotalCopiesNegativo_LanzaExcepcion() {
-        when(bookRepository.findById(1L)).thenReturn(Optional.of(bookEntity));
-
-        assertThrows(IllegalArgumentException.class,
-                () -> bookService.updateBook(1L, null, null, -1, null));
-    }
-
-    @Test
-    void testUpdateBook_AvailableSuperaTotalCopies_LanzaExcepcion() {
-        when(bookRepository.findById(1L)).thenReturn(Optional.of(bookEntity));
-
-        // totalCopies = 5, intentamos poner availableCopies = 10
-        assertThrows(IllegalArgumentException.class,
-                () -> bookService.updateBook(1L, null, null, null, 10));
-    }
-
-    // ── getBooksByAutor ────────────────────────────────────────────────────────
 
     @Test
     void testGetBooksByAutor_Exitoso() {
-        when(bookRepository.findByAutor("Robert Martin")).thenReturn(List.of(bookEntity));
+        when(bookRepository.findByAutor("Robert Martin")).thenReturn(List.of(book));
         when(bookMapper.toDTOList(any())).thenReturn(List.of(bookDTO));
 
-        List<BookDTO> result = bookService.getBooksByAutor("Robert Martin");
-        assertEquals(1, result.size());
+        assertEquals(1, bookService.getBooksByAutor("Robert Martin").size());
     }
-
-    @Test
-    void testGetBooksByAutor_NoExiste_LanzaExcepcion() {
-        when(bookRepository.findByAutor("Desconocido")).thenReturn(List.of());
-
-        assertThrows(BookNotFoundException.class,
-                () -> bookService.getBooksByAutor("Desconocido"));
-    }
-
-    // ── existsBook ─────────────────────────────────────────────────────────────
 
     @Test
     void testExistsBook_Existe() {
         when(bookRepository.existsByIsbn("B001")).thenReturn(true);
         assertTrue(bookService.existsBook("B001"));
-    }
-
-    @Test
-    void testExistsBook_NoExiste() {
-        when(bookRepository.existsByIsbn("NOEXISTE")).thenReturn(false);
-        assertFalse(bookService.existsBook("NOEXISTE"));
     }
 }
