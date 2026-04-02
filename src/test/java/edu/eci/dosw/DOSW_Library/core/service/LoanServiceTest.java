@@ -7,6 +7,7 @@ import edu.eci.dosw.DOSW_Library.core.exception.LoanNotFoundException;
 import edu.eci.dosw.DOSW_Library.core.model.Book;
 import edu.eci.dosw.DOSW_Library.core.model.Loan;
 import edu.eci.dosw.DOSW_Library.core.model.Status;
+import edu.eci.dosw.DOSW_Library.core.model.User;
 import edu.eci.dosw.DOSW_Library.persistence.relational.entity.LoanEntity.LoanStatus;
 import edu.eci.dosw.DOSW_Library.persistence.repository.LoanRepositoryPort;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,7 +67,7 @@ class LoanServiceTest {
                 .build();
 
         loanDTO = LoanDTO.builder()
-                .id("1L")
+                .id("1")
                 .loanDate(LocalDate.now())
                 .status(LoanStatus.ACTIVE)
                 .build();
@@ -75,11 +76,11 @@ class LoanServiceTest {
     @Test
     void testLoanBook_Exitoso() {
         when(bookService.getModelById("1")).thenReturn(book);
-        when(userService.getModelById("1")).thenReturn(any());
+        when(userService.getModelById("1")).thenReturn(User.builder().id("1").build());
         when(loanRepository.save(any())).thenReturn(loan);
-        when(loanMapper.toDTO(loan)).thenReturn(loanDTO);
+        when(loanMapper.toDTO(any())).thenReturn(loanDTO);
 
-        LoanDTO result = loanService.loanBook("1L", "1L");
+        LoanDTO result = loanService.loanBook("1", "1");
 
         assertNotNull(result);
         assertEquals(2, book.getAvailableCopies());
@@ -90,9 +91,10 @@ class LoanServiceTest {
     void testLoanBook_SinCopiaDisponible_LanzaExcepcion() {
         book.setAvailableCopies(0);
         when(bookService.getModelById("1")).thenReturn(book);
+        when(userService.getModelById("1")).thenReturn(User.builder().id("1").build());
 
         assertThrows(BookNotAvailableException.class,
-                () -> loanService.loanBook("1L", "1L"));
+                () -> loanService.loanBook("1", "1")); // ← sin L
 
         verify(loanRepository, never()).save(any());
     }
@@ -119,7 +121,7 @@ class LoanServiceTest {
         when(loanRepository.save(any())).thenReturn(loan);
         when(bookService.getModelById("1")).thenReturn(book);
 
-        loanService.returnBook("1L");
+        loanService.returnBook("1"); // ← sin L
 
         assertEquals(Status.RETURNED, loan.getStatus());
         assertNotNull(loan.getReturnDate());
@@ -131,19 +133,73 @@ class LoanServiceTest {
         when(loanRepository.findById("99")).thenReturn(Optional.empty());
 
         assertThrows(LoanNotFoundException.class,
-                () -> loanService.returnBook("99L"));
+                () -> loanService.returnBook("99")); // ← sin L
     }
 
     @Test
     void testIsBookAvailable_ConCopias_RetornaTrue() {
         when(bookService.getModelById("1")).thenReturn(book);
-        assertTrue(loanService.isBookAvailable("1L"));
+        assertTrue(loanService.isBookAvailable("1")); // ← sin L
     }
 
     @Test
     void testIsBookAvailable_SinCopias_RetornaFalse() {
         book.setAvailableCopies(0);
         when(bookService.getModelById("1")).thenReturn(book);
-        assertFalse(loanService.isBookAvailable("1L"));
+        assertFalse(loanService.isBookAvailable("1"));
+    }
+
+    // test ci/cu
+
+    @Test
+    void dadoQueHayUnaReservaRegistrada_CuandoLaConsulto_EntoncesEsExitosaValidandoId() {
+        when(loanRepository.findById("1")).thenReturn(Optional.of(loan));
+
+        Optional<Loan> result = loanRepository.findById("1");
+
+        assertTrue(result.isPresent());
+        assertEquals("1", result.get().getId());
+    }
+
+    @Test
+    void dadoQueNoHayReservas_CuandoLaConsulto_EntoncesNoRetornaNada() {
+        when(loanRepository.findById("99")).thenReturn(Optional.empty());
+
+        Optional<Loan> result = loanRepository.findById("99");
+
+        assertFalse(result.isPresent());
+    }
+
+    @Test
+    void dadoQueNoHayReservas_CuandoLaCreo_EntoncesLaCreacionEsExitosa() {
+        when(bookService.getModelById("1")).thenReturn(book);
+        when(userService.getModelById("1")).thenReturn(User.builder().id("1").build());
+        when(loanRepository.save(any())).thenReturn(loan);
+        when(loanMapper.toDTO(any())).thenReturn(loanDTO);
+
+        LoanDTO result = loanService.loanBook("1", "1");
+
+        assertNotNull(result);
+        verify(loanRepository).save(any());
+    }
+
+    @Test
+    void dadoQueHayUnaReserva_CuandoLaElimino_EntoncesLaEliminacionEsExitosa() {
+        doNothing().when(loanRepository).delete("1");
+
+        loanRepository.delete("1");
+
+        verify(loanRepository).delete("1");
+    }
+
+    @Test
+    void dadoQueHayUnaReserva_CuandoLaEliminoYConsulto_EntoncesNoRetornaNada() {
+        doNothing().when(loanRepository).delete("1");
+        when(loanRepository.findById("1")).thenReturn(Optional.empty());
+
+        loanRepository.delete("1");
+        Optional<Loan> result = loanRepository.findById("1");
+
+        assertFalse(result.isPresent());
     }
 }
