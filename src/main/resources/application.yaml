@@ -24,8 +24,9 @@ spring:
       database: biblioteca_db
 
 server:
-  port: 8443
+  port: ${SERVER_PORT:8443}
   ssl:
+    enabled: ${SSL_ENABLED:true}
     key-store: classpath:library-key.p12
     key-store-password: "123456"
     key-store-type: PKCS12
