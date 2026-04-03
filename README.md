@@ -71,3 +71,10 @@ https://www.youtube.com/watch?v=7D4nlBOfeTo
 
 https://www.youtube.com/watch?v=-19HLQSgZGY
 
+# video Reto # 5 - Pruebas funcionales
+
+https://youtu.be/_FBnEqg0YYk
+
+https://youtu.be/UCf-QWhA-iI
+
+
