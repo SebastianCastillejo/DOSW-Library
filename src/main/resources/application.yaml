@@ -1,36 +1,34 @@
 spring:
   profiles:
-    active: ${SPRING_PROFILES_ACTIVE:mongo}
+    active: mongo # Valor por defecto
 
+# --- Este bloque solo se activa si el perfil es 'relational' ---
+---
+spring:
+  config:
+    activate:
+      on-profile: relational
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5433/biblioteca_db}
-    username: ${DB_USER:postgres}
-    password: ${DB_PASSWORD:12345}
+    url: jdbc:postgresql://localhost:5433/biblioteca_db
+    username: postgres
+    password: 12345
     driver-class-name: org.postgresql.Driver
-
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
-    open-in-view: false
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
 
+# --- Este bloque solo se activa si el perfil es 'mongo' ---
+---
+spring:
+  config:
+    activate:
+      on-profile: mongo
   data:
     mongodb:
-      # Azure usará su variable, localmente usa tu Cluster0
       uri: ${SPRING_DATA_MONGODB_URI:mongodb+srv://castillejoangulo:Vien2023@cluster0.0cw5yye.mongodb.net/?appName=Cluster0}
       database: biblioteca_db
 
 server:
-  # Azure inyecta 'PORT', si no existe usa 8080 (estándar Spring)
   port: ${PORT:8080}
   ssl:
-    # IMPORTANTE: En Azure debe ser 'false' para que no pida el .p12
     enabled: ${SSL_ENABLED:false}
-    key-store: classpath:library-key.p12
-    key-store-password: "123456"
-    key-store-type: PKCS12
-    key-alias: library
