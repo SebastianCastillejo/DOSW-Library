@@ -20,14 +20,10 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb+srv://castillejoangulo:Vien2023@cluster0.0cw5yye.mongodb.net/?appName=Cluster0
+      uri: ${SPRING_DATA_MONGODB_URI}
       database: biblioteca_db
 
 server:
-  port: ${SERVER_PORT:8443}
+  port: ${PORT:80} # Azure inyecta la variable PORT automáticamente
   ssl:
-    enabled: ${SSL_ENABLED:true}
-    key-store: classpath:library-key.p12
-    key-store-password: "123456"
-    key-store-type: PKCS12
-    key-alias: library
+    enabled: false # Desactívalo para el despliegue inicial
