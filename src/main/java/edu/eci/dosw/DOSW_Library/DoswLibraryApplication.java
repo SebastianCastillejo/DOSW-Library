@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
-@EnableJpaRepositories(basePackages = "edu.eci.dosw.DOSW_Library.persistence.relational.repository")
+//@EnableJpaRepositories(basePackages = "edu.eci.dosw.DOSW_Library.persistence.relational.repository")
 @EnableMongoRepositories(basePackages = "edu.eci.dosw.DOSW_Library.persistence.nonrelational.repository")
 public class DoswLibraryApplication {
 
