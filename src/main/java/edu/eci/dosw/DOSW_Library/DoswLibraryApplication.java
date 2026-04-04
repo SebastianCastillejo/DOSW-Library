@@ -2,10 +2,11 @@ package edu.eci.dosw.DOSW_Library;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 @EnableJpaRepositories(basePackages = "edu.eci.dosw.DOSW_Library.persistence.relational.repository")
 @EnableMongoRepositories(basePackages = "edu.eci.dosw.DOSW_Library.persistence.nonrelational.repository")
 public class DoswLibraryApplication {
