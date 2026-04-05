@@ -83,3 +83,6 @@ https://youtu.be/Sac58RuvOCc
 
 ![img.png](img/img.png)
 ![img2.png](img/img2.png)
+
+# Reto # 8 - 
+[high-level-design.md](docs/high-level-design.md)
