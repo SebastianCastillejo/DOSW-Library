@@ -2,32 +2,20 @@ spring:
   profiles:
     active: mongo
 
-  datasource:
-    url: jdbc:postgresql://localhost:5433/biblioteca_db
-    username: postgres
-    password: 12345
-    driver-class-name: org.postgresql.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    open-in-view: false
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
-
+---
+spring:
+  config:
+    activate:
+      on-profile: mongo
   data:
     mongodb:
-      uri: mongodb+srv://castillejoangulo:Vien2023@cluster0.0cw5yye.mongodb.net/?appName=Cluster0
+      uri: ${SPRING_DATA_MONGODB_URI}
       database: biblioteca_db
+  # Forzar la exclusión también desde propiedades por si acaso
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
 
 server:
-  port: ${SERVER_PORT:8443}
-  ssl:
-    enabled: ${SSL_ENABLED:true}
-    key-store: classpath:library-key.p12
-    key-store-password: "123456"
-    key-store-type: PKCS12
-    key-alias: library
+  port: ${PORT:80}
