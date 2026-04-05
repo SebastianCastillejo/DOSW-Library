@@ -77,4 +77,9 @@ https://youtu.be/_FBnEqg0YYk
 
 https://youtu.be/UCf-QWhA-iI
 
+# video Reto # 7 - Azure CI/CD
 
+https://youtu.be/Sac58RuvOCc
+
+![img.png](img/img.png)
+![img2.png](img/img2.png)

@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import edu.eci.dosw.DOSW_Library.persistence.relational.entity.UserEntity; // Ajusta según tu entidad
 
@@ -17,8 +18,8 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    // Esta llave debe tener al menos 32 caracteres (256 bits) para HS256
-    private static final String SECRET_KEY = "MiClaveSecretaSuperSeguraParaLaBibliotecaECI2026";
+    @Value("${JWT_SECRET}")
+    private String SECRET_KEY;;
 
     // TTL: 24 horas en milisegundos [cite: 72]
     private static final long JWT_EXPIRATION = 86400000;
