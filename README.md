@@ -18,6 +18,10 @@ Mapper:. evitan que expongas datos sensibles de tu base de datos directamente al
 pero para este caso aun no lo tenemos implementado al igual que los dtos
 
 ![img_12.png](img/img_12.png)
+
+Mongo
+![mongo.png](img/mongo.png)
+
 # Ejecucion funcionalidades api
 ## BOOK
 
